@@ -6,6 +6,7 @@ import ContactSellerButton from "@/components/ContactSellerButton";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ScamWarningBanner from "@/components/ScamWarningBanner";
 import ListingImageGallery from "@/components/ListingImageGallery";
+import RatingSummary from "@/components/RatingSummary";
 import { paymentMethodLabel } from "@/lib/paymentMethods";
 
 export default async function ListingDetailPage({
@@ -29,6 +30,12 @@ export default async function ListingDetailPage({
     .maybeSingle();
 
   if (!listing) notFound();
+
+  const { data: ratingRow } = await supabase
+    .from("profile_ratings")
+    .select("average_rating, review_count")
+    .eq("user_id", listing.user_id)
+    .maybeSingle();
 
   const images = (listing.listing_images ?? []).slice().sort((a, b) => a.position - b.position);
   const isOwner = user?.id === listing.user_id;
@@ -74,9 +81,18 @@ export default async function ListingDetailPage({
             <p className="text-2xl font-bold text-brand-700">
               {formatPrice(listing.price, listing.currency)}
             </p>
-            <p className="mt-1 text-sm text-gray-500">
+            <Link
+              href={`/users/${listing.user_id}`}
+              className="mt-1 block text-sm text-gray-500 hover:text-brand-600 hover:underline"
+            >
               Listed by {seller?.username || seller?.full_name || "a user"}
-            </p>
+            </Link>
+            <div className="mt-1">
+              <RatingSummary
+                averageRating={ratingRow?.average_rating ?? null}
+                reviewCount={ratingRow?.review_count ?? null}
+              />
+            </div>
 
             {listing.payment_methods && listing.payment_methods.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-1.5">

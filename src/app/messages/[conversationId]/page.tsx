@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import MessageThread from "@/components/MessageThread";
 import ScamWarningBanner from "@/components/ScamWarningBanner";
+import ReviewForm from "@/components/ReviewForm";
 
 export default async function ConversationPage({
   params,
@@ -48,6 +49,13 @@ export default async function ConversationPage({
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
+  const { data: existingReview } = await supabase
+    .from("reviews")
+    .select("rating, body")
+    .eq("conversation_id", conversationId)
+    .eq("reviewer_id", user.id)
+    .maybeSingle();
+
   return (
     <div className="container-px max-w-2xl py-8">
       <div className="mb-4">
@@ -73,6 +81,17 @@ export default async function ConversationPage({
         currentUserId={user.id}
         initialMessages={messages ?? []}
       />
+
+      {other && (
+        <div className="mt-4">
+          <ReviewForm
+            conversationId={conversationId}
+            revieweeId={other.id}
+            revieweeName={other.username || other.full_name || "this user"}
+            existingReview={existingReview ?? null}
+          />
+        </div>
+      )}
     </div>
   );
 }
