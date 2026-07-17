@@ -39,3 +39,15 @@ body {
 .card {
   @apply rounded-lg border border-gray-200 bg-white shadow-sm;
 }
+
+/* Known in-app browsers (Telegram, Instagram, etc.) mishandle fixed
+   positioning combined with their own toolbar chrome. Drop the header
+   back into normal document flow there instead of fighting it. */
+.in-app-browser header {
+  position: static;
+  transform: none !important;
+}
+
+.in-app-browser main {
+  padding-top: 0;
+}
