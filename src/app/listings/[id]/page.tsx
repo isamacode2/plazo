@@ -1,11 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice, timeAgo } from "@/lib/format";
 import ContactSellerButton from "@/components/ContactSellerButton";
 import DeleteListingButton from "@/components/DeleteListingButton";
 import ScamWarningBanner from "@/components/ScamWarningBanner";
+import ListingImageGallery from "@/components/ListingImageGallery";
 import { paymentMethodLabel } from "@/lib/paymentMethods";
 
 export default async function ListingDetailPage({
@@ -53,24 +53,7 @@ export default async function ListingDetailPage({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          {images.length > 0 ? (
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {images.map((img, i) => (
-                <div
-                  key={img.id}
-                  className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${
-                    i === 0 ? "col-span-2 row-span-2 sm:col-span-2 sm:row-span-2" : ""
-                  }`}
-                >
-                  <Image src={img.url} alt={listing.title} fill className="object-cover" />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex aspect-video items-center justify-center rounded-lg bg-gray-100 text-6xl text-gray-300">
-              📷
-            </div>
-          )}
+          <ListingImageGallery images={images} title={listing.title} />
 
           <div className="mt-6">
             <h1 className="text-2xl font-semibold text-gray-900">{listing.title}</h1>
