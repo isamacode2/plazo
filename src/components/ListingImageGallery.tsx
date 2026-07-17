@@ -12,18 +12,19 @@ export default function ListingImageGallery({
   images: GalleryImage[];
   title: string;
 }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  const close = () => setOpenIndex(null);
-  const prev = () =>
-    setOpenIndex((i) => (i === null ? null : (i - 1 + images.length) % images.length));
-  const next = () => setOpenIndex((i) => (i === null ? null : (i + 1) % images.length));
+  const hasMultiple = images.length > 1;
+
+  const prev = () => setActiveIndex((i) => (i - 1 + images.length) % images.length);
+  const next = () => setActiveIndex((i) => (i + 1) % images.length);
 
   useEffect(() => {
-    if (openIndex === null) return;
+    if (!lightboxOpen) return;
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") setLightboxOpen(false);
       if (e.key === "ArrowLeft") prev();
       if (e.key === "ArrowRight") next();
     }
@@ -35,7 +36,7 @@ export default function ListingImageGallery({
       document.body.style.overflow = "";
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [openIndex, images.length]);
+  }, [lightboxOpen, images.length]);
 
   if (images.length === 0) {
     return (
@@ -47,38 +48,85 @@ export default function ListingImageGallery({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {images.map((img, i) => (
-          <button
-            key={img.id}
-            type="button"
-            onClick={() => setOpenIndex(i)}
-            className={`relative aspect-square overflow-hidden rounded-lg bg-gray-100 ${
-              i === 0 ? "col-span-2 row-span-2 sm:col-span-2 sm:row-span-2" : ""
-            }`}
-          >
-            <Image src={img.url} alt={title} fill className="object-cover" />
-          </button>
-        ))}
+      {/* Main hero image with visible prev/next arrows */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-gray-100 sm:aspect-video">
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(true)}
+          className="absolute inset-0"
+          aria-label="Open full-size image"
+        >
+          <Image
+            src={images[activeIndex].url}
+            alt={title}
+            fill
+            sizes="(max-width: 1024px) 100vw, 66vw"
+            className="object-cover"
+            priority
+          />
+        </button>
+
+        {hasMultiple && (
+          <>
+            <button
+              type="button"
+              onClick={prev}
+              aria-label="Previous image"
+              className="absolute left-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-2xl text-white hover:bg-black/60"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={next}
+              aria-label="Next image"
+              className="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-2xl text-white hover:bg-black/60"
+            >
+              ›
+            </button>
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-black/40 px-2.5 py-0.5 text-xs text-white">
+              {activeIndex + 1} / {images.length}
+            </div>
+          </>
+        )}
       </div>
 
-      {openIndex !== null && (
+      {/* Thumbnail strip */}
+      {hasMultiple && (
+        <div className="mt-2 flex gap-2 overflow-x-auto pb-1">
+          {images.map((img, i) => (
+            <button
+              key={img.id}
+              type="button"
+              onClick={() => setActiveIndex(i)}
+              className={`relative h-16 w-16 shrink-0 overflow-hidden rounded-md ${
+                i === activeIndex ? "ring-2 ring-brand-600" : "opacity-70 hover:opacity-100"
+              }`}
+            >
+              <Image src={img.url} alt="" fill sizes="64px" className="object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Full-screen lightbox */}
+      {lightboxOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
           role="dialog"
           aria-modal="true"
-          onClick={close}
+          onClick={() => setLightboxOpen(false)}
         >
           <button
             type="button"
-            onClick={close}
+            onClick={() => setLightboxOpen(false)}
             aria-label="Close"
             className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
           >
             ×
           </button>
 
-          {images.length > 1 && (
+          {hasMultiple && (
             <button
               type="button"
               onClick={(e) => {
@@ -97,7 +145,7 @@ export default function ListingImageGallery({
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={images[openIndex].url}
+              src={images[activeIndex].url}
               alt={title}
               fill
               sizes="100vw"
@@ -106,7 +154,7 @@ export default function ListingImageGallery({
             />
           </div>
 
-          {images.length > 1 && (
+          {hasMultiple && (
             <button
               type="button"
               onClick={(e) => {
@@ -120,9 +168,9 @@ export default function ListingImageGallery({
             </button>
           )}
 
-          {images.length > 1 && (
+          {hasMultiple && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-sm text-white">
-              {openIndex + 1} / {images.length}
+              {activeIndex + 1} / {images.length}
             </div>
           )}
         </div>

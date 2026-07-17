@@ -10,7 +10,9 @@ export default async function Navbar() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className="sticky top-0 z-20 border-b border-gray-200 bg-white [transform:translateZ(0)]">
+    <header
+      className="fixed inset-x-0 top-0 z-[100] border-b border-gray-200 bg-white [-webkit-transform:translate3d(0,0,0)] [transform:translate3d(0,0,0)] [will-change:transform]"
+    >
       <div className="container-px flex h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold text-brand-700">
           <Logo className="h-7 w-7 text-brand-600" />
