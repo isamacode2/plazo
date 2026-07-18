@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { timeAgo } from "@/lib/format";
+import { logEvent } from "@/lib/analytics";
 
 export type ThreadMessage = {
   id: string;
@@ -94,6 +95,10 @@ export default function MessageThread({
       setBody("");
       if (data) {
         setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]));
+        logEvent(supabase, "message_sent", {
+          userId: currentUserId,
+          metadata: { conversation_id: conversationId },
+        });
       }
     }
   }

@@ -53,11 +53,16 @@ export default async function AdminReportsPage() {
 
   return (
     <div className="container-px py-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">Admin · Reports</h1>
-        <Link href="/" className="btn-secondary">
-          Back to site
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/admin/analytics" className="btn-secondary">
+            Analytics
+          </Link>
+          <Link href="/" className="btn-secondary">
+            Back to site
+          </Link>
+        </div>
       </div>
 
       {error && (

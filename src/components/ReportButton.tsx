@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { logEvent } from "@/lib/analytics";
 
 const REASONS = [
   "Prohibited or illegal item",
@@ -57,6 +58,10 @@ export default function ReportButton({
       setError(insertError.message);
       return;
     }
+    logEvent(supabase, "report_filed", {
+      userId: user.id,
+      metadata: { listing_id: listingId ?? null, user_id: userId ?? null, reason },
+    });
     setDone(true);
   }
 

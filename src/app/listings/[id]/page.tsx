@@ -10,6 +10,7 @@ import ListingImageGallery from "@/components/ListingImageGallery";
 import RatingSummary from "@/components/RatingSummary";
 import ReportButton from "@/components/ReportButton";
 import { paymentMethodLabel } from "@/lib/paymentMethods";
+import { logEvent } from "@/lib/analytics";
 
 export default async function ListingDetailPage({
   params,
@@ -41,6 +42,13 @@ export default async function ListingDetailPage({
 
   const images = (listing.listing_images ?? []).slice().sort((a, b) => a.position - b.position);
   const isOwner = user?.id === listing.user_id;
+
+  if (!isOwner) {
+    await logEvent(supabase, "listing_viewed", {
+      userId: user?.id ?? null,
+      metadata: { listing_id: listing.id },
+    });
+  }
   const seller = listing.profiles as unknown as { username: string | null; full_name: string | null } | null;
   const category = listing.categories as unknown as { name: string; slug: string } | null;
 

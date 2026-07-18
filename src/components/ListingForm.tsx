@@ -9,6 +9,7 @@ import type { Category } from "@/components/CategoryNav";
 import { PAYMENT_METHODS } from "@/lib/paymentMethods";
 import { CURRENCIES } from "@/lib/currencies";
 import { ACCRA_LOCATIONS } from "@/lib/accraLocations";
+import { logEvent } from "@/lib/analytics";
 
 type ExistingImage = { id: string; url: string };
 
@@ -133,6 +134,10 @@ export default function ListingForm({
           .single();
         if (insertError) throw insertError;
         id = data.id;
+        logEvent(supabase, "listing_posted", {
+          userId: user.id,
+          metadata: { listing_id: data.id, category_id: payload.category_id },
+        });
       } else {
         const { error: updateError } = await supabase
           .from("listings")

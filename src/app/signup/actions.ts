@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { logEvent } from "@/lib/analytics";
 
 export async function signup(formData: FormData) {
   const supabase = await createClient();
@@ -44,6 +45,8 @@ export async function signup(formData: FormData) {
   if (error) {
     redirect(`/signup?error=${encodeURIComponent(error.message)}`);
   }
+
+  await logEvent(supabase, "signup", { userId: data.user?.id ?? null });
 
   // If email confirmations are turned off in Supabase, signUp() returns an
   // active session right away and no email is sent — send the user straight

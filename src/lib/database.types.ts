@@ -120,6 +120,38 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_images: {
         Row: {
           created_at: string
@@ -429,6 +461,21 @@ export type Database = {
       }
     }
     Functions: {
+      admin_daily_event_counts: {
+        Args: { p_days?: number }
+        Returns: {
+          count: number
+          day: string
+          event_type: string
+        }[]
+      }
+      admin_event_totals: {
+        Args: never
+        Returns: {
+          count: number
+          event_type: string
+        }[]
+      }
       expire_stale_listings: { Args: never; Returns: undefined }
       find_similar_listings: {
         Args: { p_exclude_id?: string; p_title: string }
