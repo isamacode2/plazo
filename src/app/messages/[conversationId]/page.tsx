@@ -67,14 +67,14 @@ export default async function ConversationPage({
 
   return (
     <div className="container-px max-w-2xl py-8">
-      <div className="mb-4">
+      <div className="mb-4 flex flex-col items-start gap-0.5">
         <Link href="/messages" className="text-sm text-brand-600 hover:underline">
           ← All messages
         </Link>
         {other ? (
           <Link
             href={`/users/${other.id}`}
-            className="mt-1 inline-block text-xl font-semibold text-gray-900 hover:text-brand-600 hover:underline"
+            className="mt-1 block text-xl font-semibold text-gray-900 hover:text-brand-600 hover:underline"
           >
             {other.username || other.full_name || "Conversation"}
           </Link>
