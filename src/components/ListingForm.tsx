@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import type { Category } from "@/components/CategoryNav";
 import { PAYMENT_METHODS } from "@/lib/paymentMethods";
@@ -52,6 +53,7 @@ export default function ListingForm({
   const [images, setImages] = useState<ExistingImage[]>(existingImages);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [similar, setSimilar] = useState<{ id: string; title: string }[] | null>(null);
 
   async function removeExistingImage(image: ExistingImage) {
     await supabase.from("listing_images").delete().eq("id", image.id);
@@ -81,6 +83,21 @@ export default function ListingForm({
       return;
     }
 
+    if (mode === "create") {
+      const { data: matches } = await supabase.rpc("find_similar_listings", {
+        p_title: title.trim(),
+      });
+      if (matches && matches.length > 0) {
+        setSimilar(matches);
+        return;
+      }
+    }
+
+    await doSubmit();
+  }
+
+  async function doSubmit() {
+    setSimilar(null);
     setSubmitting(true);
 
     try {
@@ -360,6 +377,33 @@ export default function ListingForm({
           At least one photo is required — listings without photos get skipped over.
         </p>
       </div>
+
+      {similar && similar.length > 0 && (
+        <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+          <p className="font-medium">You already have a similar active listing:</p>
+          <ul className="mt-1 list-inside list-disc">
+            {similar.map((s) => (
+              <li key={s.id}>
+                <Link href={`/listings/${s.id}`} className="underline" target="_blank">
+                  {s.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs">
+            Posting duplicates can get your listings hidden. If this is a different item, you can
+            post anyway.
+          </p>
+          <button
+            type="button"
+            onClick={doSubmit}
+            disabled={submitting}
+            className="btn-secondary mt-2"
+          >
+            {submitting ? "Saving..." : "Post anyway"}
+          </button>
+        </div>
+      )}
 
       <button type="submit" disabled={submitting} className="btn-primary">
         {submitting ? "Saving..." : mode === "create" ? "Post listing" : "Save changes"}

@@ -421,6 +421,14 @@ export type Database = {
     }
     Functions: {
       expire_stale_listings: { Args: never; Returns: undefined }
+      find_similar_listings: {
+        Args: { p_exclude_id?: string; p_title: string }
+        Returns: {
+          id: string
+          similarity: number
+          title: string
+        }[]
+      }
     }
     Enums: {
       listing_status: "active" | "sold" | "expired" | "draft"
