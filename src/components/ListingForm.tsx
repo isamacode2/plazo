@@ -6,6 +6,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import type { Category } from "@/components/CategoryNav";
 import { PAYMENT_METHODS } from "@/lib/paymentMethods";
+import { CURRENCIES } from "@/lib/currencies";
 
 type ExistingImage = { id: string; url: string };
 
@@ -37,6 +38,7 @@ export default function ListingForm({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [price, setPrice] = useState(initial?.price?.toString() ?? "");
+  const [currency, setCurrency] = useState(initial?.currency ?? "USD");
   const [location, setLocation] = useState(initial?.location ?? "");
   const [categoryId, setCategoryId] = useState(
     initial?.category_id?.toString() ?? categories[0]?.id.toString() ?? ""
@@ -75,6 +77,7 @@ export default function ListingForm({
         title,
         description,
         price: price ? Number(price) : null,
+        currency,
         location: location || null,
         category_id: Number(categoryId),
         status: status as "active" | "sold" | "expired" | "draft",
@@ -176,15 +179,30 @@ export default function ListingForm({
           <label className="label" htmlFor="price">
             Price (leave blank for free/contact)
           </label>
-          <input
-            className="input"
-            id="price"
-            type="number"
-            min="0"
-            step="0.01"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-          />
+          <div className="flex gap-2">
+            <select
+              className="input w-28 shrink-0"
+              id="currency"
+              aria-label="Currency"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.code}
+                </option>
+              ))}
+            </select>
+            <input
+              className="input"
+              id="price"
+              type="number"
+              min="0"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
         </div>
         <div>
           <label className="label" htmlFor="location">
