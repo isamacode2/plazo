@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 export async function signup(formData: FormData) {
@@ -10,11 +11,17 @@ export async function signup(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const username = String(formData.get("username") ?? "");
 
+  // Build the site's own origin so the confirmation email links back here
+  // instead of relying on Supabase's (often stale) Site URL setting.
+  const origin =
+    process.env.NEXT_PUBLIC_SITE_URL ?? (await headers()).get("origin") ?? "";
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { username },
+      emailRedirectTo: `${origin}/auth/confirm`,
     },
   });
 
