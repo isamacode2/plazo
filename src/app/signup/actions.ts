@@ -32,7 +32,7 @@ export async function signup(formData: FormData) {
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL ?? (await headers()).get("origin") ?? "";
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -43,6 +43,13 @@ export async function signup(formData: FormData) {
 
   if (error) {
     redirect(`/signup?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // If email confirmations are turned off in Supabase, signUp() returns an
+  // active session right away and no email is sent — send the user straight
+  // in instead of telling them to check an email that won't arrive.
+  if (data.session) {
+    redirect("/");
   }
 
   redirect("/login?error=" + encodeURIComponent("Account created. Check your email to confirm, then log in."));
