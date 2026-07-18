@@ -12,6 +12,7 @@ export default async function Navbar() {
   } = await supabase.auth.getUser();
 
   let unreadCount = 0;
+  let isAdmin = false;
   if (user) {
     const { count } = await supabase
       .from("messages")
@@ -19,6 +20,13 @@ export default async function Navbar() {
       .is("read_at", null)
       .neq("sender_id", user.id);
     unreadCount = count ?? 0;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("is_admin")
+      .eq("id", user.id)
+      .maybeSingle();
+    isAdmin = profile?.is_admin ?? false;
   }
 
   return (
@@ -47,6 +55,11 @@ export default async function Navbar() {
               <Link href="/listings/new" className="btn-primary">
                 + Post ad
               </Link>
+              {isAdmin && (
+                <Link href="/admin" className="btn-secondary">
+                  Admin
+                </Link>
+              )}
               <SignOutButton />
             </>
           ) : (
@@ -62,7 +75,7 @@ export default async function Navbar() {
         </nav>
 
         {/* Mobile: a single menu button that can never overflow the screen. */}
-        <MobileNavMenu isLoggedIn={!!user} unreadCount={unreadCount} />
+        <MobileNavMenu isLoggedIn={!!user} unreadCount={unreadCount} isAdmin={isAdmin} />
       </div>
     </StickyHeader>
   );

@@ -10,9 +10,11 @@ const itemClass =
 export default function MobileNavMenu({
   isLoggedIn,
   unreadCount = 0,
+  isAdmin = false,
 }: {
   isLoggedIn: boolean;
   unreadCount?: number;
+  isAdmin?: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -59,6 +61,11 @@ export default function MobileNavMenu({
                 <Link href="/listings/new" className={itemClass} onClick={() => setOpen(false)}>
                   + Post ad
                 </Link>
+                {isAdmin && (
+                  <Link href="/admin" className={itemClass} onClick={() => setOpen(false)}>
+                    Admin
+                  </Link>
+                )}
                 <div className="my-1 border-t border-gray-100" />
                 <SignOutButton className={itemClass} />
               </>

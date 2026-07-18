@@ -266,6 +266,8 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          is_admin: boolean
+          is_suspended: boolean
           location: string | null
           updated_at: string
           username: string | null
@@ -275,6 +277,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id: string
+          is_admin?: boolean
+          is_suspended?: boolean
           location?: string | null
           updated_at?: string
           username?: string | null
@@ -284,6 +288,8 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          is_admin?: boolean
+          is_suspended?: boolean
           location?: string | null
           updated_at?: string
           username?: string | null
@@ -299,6 +305,7 @@ export type Database = {
           reported_listing_id: string | null
           reported_user_id: string | null
           reporter_id: string
+          resolved_at: string | null
           status: string
         }
         Insert: {
@@ -309,6 +316,7 @@ export type Database = {
           reported_listing_id?: string | null
           reported_user_id?: string | null
           reporter_id: string
+          resolved_at?: string | null
           status?: string
         }
         Update: {
@@ -319,6 +327,7 @@ export type Database = {
           reported_listing_id?: string | null
           reported_user_id?: string | null
           reporter_id?: string
+          resolved_at?: string | null
           status?: string
         }
         Relationships: [
@@ -429,9 +438,11 @@ export type Database = {
           title: string
         }[]
       }
+      is_admin: { Args: { p_user_id: string }; Returns: boolean }
+      is_suspended: { Args: { p_user_id: string }; Returns: boolean }
     }
     Enums: {
-      listing_status: "active" | "sold" | "expired" | "draft"
+      listing_status: "active" | "sold" | "expired" | "draft" | "removed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -559,7 +570,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      listing_status: ["active", "sold", "expired", "draft"],
+      listing_status: ["active", "sold", "expired", "draft", "removed"],
     },
   },
 } as const
