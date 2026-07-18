@@ -80,7 +80,6 @@ export default async function Footer() {
       <div className="border-t border-gray-100">
         <div className="container-px flex flex-col items-center justify-between gap-2 py-4 text-xs text-gray-400 sm:flex-row">
           <p>© {new Date().getFullYear()} Plazo. All rights reserved.</p>
-          <p>Made for Accra, Ghana &amp; Croatia.</p>
         </div>
       </div>
     </footer>
