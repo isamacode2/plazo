@@ -59,7 +59,7 @@ export default async function HomePage({
     query = query.lte("price", Number(params.max));
   }
   if (params.location) {
-    query = query.ilike("location", `%${params.location}%`);
+    query = query.eq("location", params.location);
   }
 
   const { data: listings, error } = await query;

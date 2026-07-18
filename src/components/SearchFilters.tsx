@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useState, FormEvent } from "react";
+import { ACCRA_LOCATIONS } from "@/lib/accraLocations";
 
 export default function SearchFilters() {
   const router = useRouter();
@@ -55,12 +56,18 @@ export default function SearchFilters() {
         value={maxPrice}
         onChange={(e) => setMaxPrice(e.target.value)}
       />
-      <input
+      <select
         className="input"
-        placeholder="Location"
         value={location}
         onChange={(e) => setLocation(e.target.value)}
-      />
+      >
+        <option value="">All locations</option>
+        {ACCRA_LOCATIONS.map((loc) => (
+          <option key={loc} value={loc}>
+            {loc}
+          </option>
+        ))}
+      </select>
       <button type="submit" className="btn-primary col-span-2 sm:col-span-5">
         Search
       </button>

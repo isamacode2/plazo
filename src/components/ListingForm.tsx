@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Category } from "@/components/CategoryNav";
 import { PAYMENT_METHODS } from "@/lib/paymentMethods";
 import { CURRENCIES } from "@/lib/currencies";
+import { ACCRA_LOCATIONS } from "@/lib/accraLocations";
 
 type ExistingImage = { id: string; url: string };
 
@@ -208,13 +209,22 @@ export default function ListingForm({
           <label className="label" htmlFor="location">
             Location
           </label>
-          <input
+          <select
             className="input"
             id="location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
-            placeholder="City, State"
-          />
+            required
+          >
+            <option value="" disabled>
+              Select an area
+            </option>
+            {ACCRA_LOCATIONS.map((loc) => (
+              <option key={loc} value={loc}>
+                {loc}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
