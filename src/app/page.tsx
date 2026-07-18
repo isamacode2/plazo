@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import CategoryNav from "@/components/CategoryNav";
 import SearchFilters from "@/components/SearchFilters";
@@ -85,12 +86,19 @@ export default async function HomePage({
       </div>
 
       <div className="container-px py-6">
-        <h1 className="mb-4 text-lg font-semibold text-gray-800">
-          {activeCategory ? activeCategory.name : "All listings"}
-          <span className="ml-2 text-sm font-normal text-gray-500">
-            ({cards.length} results)
-          </span>
-        </h1>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <h1 className="text-lg font-semibold text-gray-800">
+            {activeCategory ? activeCategory.name : "All listings"}
+            <span className="ml-2 text-sm font-normal text-gray-500">
+              ({cards.length} results)
+            </span>
+          </h1>
+          {user && (
+            <Link href="/my-listings" className="btn-secondary">
+              My listings
+            </Link>
+          )}
+        </div>
 
         {error && (
           <p className="text-sm text-red-600">Couldn&apos;t load listings: {error.message}</p>
