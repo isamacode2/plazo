@@ -11,6 +11,16 @@ export default async function Navbar() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  let unreadCount = 0;
+  if (user) {
+    const { count } = await supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .is("read_at", null)
+      .neq("sender_id", user.id);
+    unreadCount = count ?? 0;
+  }
+
   return (
     <StickyHeader>
       <div className="container-px flex h-16 items-center justify-between gap-4">
@@ -23,8 +33,13 @@ export default async function Navbar() {
         <nav className="hidden items-center gap-3 sm:flex">
           {user ? (
             <>
-              <Link href="/messages" className="btn-secondary">
+              <Link href="/messages" className="btn-secondary relative">
                 Messages
+                {unreadCount > 0 && (
+                  <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
               </Link>
               <Link href="/my-listings" className="btn-secondary">
                 My listings
@@ -47,7 +62,7 @@ export default async function Navbar() {
         </nav>
 
         {/* Mobile: a single menu button that can never overflow the screen. */}
-        <MobileNavMenu isLoggedIn={!!user} />
+        <MobileNavMenu isLoggedIn={!!user} unreadCount={unreadCount} />
       </div>
     </StickyHeader>
   );

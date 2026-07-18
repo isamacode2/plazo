@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatPrice, timeAgo } from "@/lib/format";
 import ContactSellerButton from "@/components/ContactSellerButton";
 import DeleteListingButton from "@/components/DeleteListingButton";
+import ShareButton from "@/components/ShareButton";
 import ScamWarningBanner from "@/components/ScamWarningBanner";
 import ListingImageGallery from "@/components/ListingImageGallery";
 import RatingSummary from "@/components/RatingSummary";
@@ -118,6 +119,7 @@ export default async function ListingDetailPage({
               ) : (
                 <ContactSellerButton listingId={listing.id} sellerId={listing.user_id} />
               )}
+              <ShareButton title={listing.title} />
             </div>
 
             {!isOwner && (

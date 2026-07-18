@@ -27,15 +27,27 @@ export default async function MessagesInboxPage() {
   const { data: messages } = ids.length
     ? await supabase
         .from("messages")
-        .select("conversation_id, body, created_at, sender_id")
+        .select("conversation_id, body, created_at, sender_id, read_at")
         .in("conversation_id", ids)
         .order("created_at", { ascending: false })
-    : { data: [] as { conversation_id: string; body: string; created_at: string; sender_id: string }[] };
+    : {
+        data: [] as {
+          conversation_id: string;
+          body: string;
+          created_at: string;
+          sender_id: string;
+          read_at: string | null;
+        }[],
+      };
 
   const lastMessageByConversation = new Map<string, { body: string; created_at: string }>();
+  const unreadConversations = new Set<string>();
   for (const m of messages ?? []) {
     if (!lastMessageByConversation.has(m.conversation_id)) {
       lastMessageByConversation.set(m.conversation_id, { body: m.body, created_at: m.created_at });
+    }
+    if (m.read_at === null && m.sender_id !== user!.id) {
+      unreadConversations.add(m.conversation_id);
     }
   }
 
@@ -55,19 +67,37 @@ export default async function MessagesInboxPage() {
             const other = user!.id === buyer?.id ? seller : buyer;
             const listing = c.listings as unknown as { title: string } | null;
             const last = lastMessageByConversation.get(c.id);
+            const unread = unreadConversations.has(c.id);
 
             return (
               <Link
                 key={c.id}
                 href={`/messages/${c.id}`}
-                className="flex items-center justify-between gap-4 p-4 hover:bg-gray-50"
+                className={`flex items-center justify-between gap-4 p-4 hover:bg-gray-50 ${
+                  unread ? "bg-brand-50/60" : ""
+                }`}
               >
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-gray-900">
-                    {other?.username || other?.full_name || "User"}
-                  </p>
-                  <p className="truncate text-sm text-gray-500">{listing?.title}</p>
-                  {last && <p className="truncate text-sm text-gray-400">{last.body}</p>}
+                <div className="flex min-w-0 items-center gap-2">
+                  {unread && (
+                    <span className="h-2 w-2 shrink-0 rounded-full bg-brand-600" aria-hidden />
+                  )}
+                  <div className="min-w-0">
+                    <p
+                      className={`truncate ${
+                        unread ? "font-semibold text-gray-900" : "font-medium text-gray-900"
+                      }`}
+                    >
+                      {other?.username || other?.full_name || "User"}
+                    </p>
+                    <p className="truncate text-sm text-gray-500">{listing?.title}</p>
+                    {last && (
+                      <p
+                        className={`truncate text-sm ${unread ? "text-gray-700" : "text-gray-400"}`}
+                      >
+                        {last.body}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 {last && (
                   <span className="shrink-0 text-xs text-gray-400">{timeAgo(last.created_at)}</span>

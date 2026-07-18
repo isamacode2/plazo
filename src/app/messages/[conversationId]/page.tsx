@@ -49,6 +49,15 @@ export default async function ConversationPage({
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
 
+  // Mark the other person's messages as read now that this conversation is
+  // open — clears the unread badge in the nav.
+  await supabase
+    .from("messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("conversation_id", conversationId)
+    .neq("sender_id", user.id)
+    .is("read_at", null);
+
   const { data: existingReview } = await supabase
     .from("reviews")
     .select("rating, body")
