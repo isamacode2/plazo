@@ -19,6 +19,10 @@ export default async function HomePage({
   const params = await searchParams;
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: categories } = await supabase
     .from("categories")
     .select("*")
@@ -32,6 +36,13 @@ export default async function HomePage({
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(48);
+
+  // Browse feed is for finding things to buy — your own listings belong in
+  // "My listings", not mixed in here where it's easy to mistake them for
+  // someone else's and click in confused.
+  if (user) {
+    query = query.neq("user_id", user.id);
+  }
 
   const activeCategory = categories?.find((c) => c.slug === params.category);
   if (activeCategory) {
