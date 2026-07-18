@@ -58,9 +58,29 @@ export default function ListingForm({
     setImages((prev) => prev.filter((i) => i.id !== image.id));
   }
 
+  function validate(): string | null {
+    if (title.trim().length < 5) {
+      return "Title must be at least 5 characters.";
+    }
+    if (description.trim().length < 20) {
+      return "Description must be at least 20 characters — give buyers enough to go on.";
+    }
+    if (images.length + files.length < 1) {
+      return "Add at least one photo before publishing.";
+    }
+    return null;
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -152,6 +172,7 @@ export default function ListingForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
+          minLength={5}
           maxLength={120}
         />
       </div>
@@ -238,6 +259,8 @@ export default function ListingForm({
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           required
+          minLength={20}
+          placeholder="Condition, size, why you're selling, pickup details — give buyers enough to know if it's right for them (at least 20 characters)."
         />
       </div>
 
@@ -333,6 +356,9 @@ export default function ListingForm({
           multiple
           onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
         />
+        <p className="mt-1 text-xs text-gray-500">
+          At least one photo is required — listings without photos get skipped over.
+        </p>
       </div>
 
       <button type="submit" disabled={submitting} className="btn-primary">
