@@ -158,7 +158,9 @@ export type Database = {
           created_at: string
           currency: string
           description: string
+          expires_at: string
           id: string
+          last_confirmed_at: string
           location: string | null
           payment_methods: string[]
           price: number | null
@@ -172,7 +174,9 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string
+          expires_at?: string
           id?: string
+          last_confirmed_at?: string
           location?: string | null
           payment_methods?: string[]
           price?: number | null
@@ -186,7 +190,9 @@ export type Database = {
           created_at?: string
           currency?: string
           description?: string
+          expires_at?: string
           id?: string
+          last_confirmed_at?: string
           location?: string | null
           payment_methods?: string[]
           price?: number | null
@@ -414,7 +420,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      expire_stale_listings: { Args: never; Returns: undefined }
     }
     Enums: {
       listing_status: "active" | "sold" | "expired" | "draft"
