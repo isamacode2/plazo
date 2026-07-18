@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { timeAgo } from "@/lib/format";
 
@@ -21,10 +22,20 @@ export default function MessageThread({
   initialMessages: ThreadMessage[];
 }) {
   const supabase = createClient();
+  const router = useRouter();
   const [messages, setMessages] = useState<ThreadMessage[]>(initialMessages);
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // The server already marked everything read as of page load — but the
+  // navbar's unread badge is part of the shared layout, which Next.js
+  // doesn't automatically re-fetch on a soft navigation into this page.
+  // Force it to pick up the change once we've mounted.
+  useEffect(() => {
+    router.refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const channel = supabase
@@ -42,6 +53,17 @@ export default function MessageThread({
           setMessages((prev) =>
             prev.some((m) => m.id === newMessage.id) ? prev : [...prev, newMessage]
           );
+
+          // A message that streams in while this conversation is already
+          // open is being read in real time — mark it read immediately so
+          // it doesn't sit in the unread badge until the page is reopened.
+          if (newMessage.sender_id !== currentUserId) {
+            supabase
+              .from("messages")
+              .update({ read_at: new Date().toISOString() })
+              .eq("id", newMessage.id)
+              .then(() => router.refresh());
+          }
         }
       )
       .subscribe();
@@ -49,6 +71,7 @@ export default function MessageThread({
     return () => {
       supabase.removeChannel(channel);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationId, supabase]);
 
   useEffect(() => {
