@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import SignOutButton from "@/components/SignOutButton";
 import Logo from "@/components/Logo";
 import StickyHeader from "@/components/StickyHeader";
+import MobileNavMenu from "@/components/MobileNavMenu";
 
 export default async function Navbar() {
   const supabase = await createClient();
@@ -18,41 +19,35 @@ export default async function Navbar() {
           <span>Plazo</span>
         </Link>
 
-        <nav className="flex items-center gap-1.5 sm:gap-3">
+        {/* Desktop/tablet: full row of actions, sm breakpoint and up only. */}
+        <nav className="hidden items-center gap-3 sm:flex">
           {user ? (
             <>
-              <Link href="/messages" className="btn-secondary hidden sm:inline-flex">
+              <Link href="/messages" className="btn-secondary">
                 Messages
               </Link>
-              <Link href="/my-listings" className="btn-secondary hidden sm:inline-flex">
+              <Link href="/my-listings" className="btn-secondary">
                 My listings
               </Link>
-              <Link
-                href="/listings/new"
-                className="btn-primary px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
-              >
-                <span className="sm:hidden">+ Post</span>
-                <span className="hidden sm:inline">+ Post ad</span>
+              <Link href="/listings/new" className="btn-primary">
+                + Post ad
               </Link>
               <SignOutButton />
             </>
           ) : (
             <>
-              <Link
-                href="/login"
-                className="btn-secondary px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
-              >
+              <Link href="/login" className="btn-secondary">
                 Log in
               </Link>
-              <Link
-                href="/signup"
-                className="btn-primary px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
-              >
+              <Link href="/signup" className="btn-primary">
                 Sign up
               </Link>
             </>
           )}
         </nav>
+
+        {/* Mobile: a single menu button that can never overflow the screen. */}
+        <MobileNavMenu isLoggedIn={!!user} />
       </div>
     </StickyHeader>
   );
