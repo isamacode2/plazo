@@ -8,12 +8,12 @@ export default function PrivacyPage() {
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
         <p className="font-medium">This is a draft, not a finished legal document.</p>
         <p className="mt-1">
-          Because Croatia is in the EU, GDPR applies to any Croatian users&apos; data —
-          that comes with specific requirements (lawful basis for processing, data subject
-          access/deletion rights, breach notification timelines, and possibly a registered EU
-          representative). Ghana&apos;s Data Protection Act, 2012 (Act 843) applies separately
-          for Ghanaian users. This page needs a privacy lawyer&apos;s review before you launch
-          in either market, not just a copy-paste template.
+          Depending on where your users are, laws like the EU&apos;s GDPR or other regional data
+          protection regulations may apply — these typically require a lawful basis for
+          processing data, give users rights to access or delete their data, and set breach
+          notification timelines. Since Plazo isn&apos;t limited to any one market, have a
+          privacy lawyer review this before you launch, rather than relying on a copy-paste
+          template.
         </p>
       </div>
 

@@ -8,9 +8,10 @@ export default function TermsPage() {
       <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
         <p className="font-medium">This is a draft, not a finished legal document.</p>
         <p className="mt-1">
-          It&apos;s a reasonable starting point, but you operate in two jurisdictions with real
-          legal requirements — Croatia (EU/GDPR) and Ghana (Data Protection Act, 2012, Act 843).
-          Have a lawyer familiar with both review and finalize this before you launch publicly.
+          It&apos;s a reasonable starting point, but since Plazo isn&apos;t limited to any one
+          country, the specific legal requirements that apply depend on where your users
+          actually are. Have a lawyer review and finalize this for the jurisdictions you launch
+          in before relying on it.
         </p>
       </div>
 
