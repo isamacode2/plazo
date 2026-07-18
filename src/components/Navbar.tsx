@@ -18,7 +18,7 @@ export default async function Navbar() {
           <span>Plazo</span>
         </Link>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-1.5 sm:gap-3">
           {user ? (
             <>
               <Link href="/messages" className="btn-secondary hidden sm:inline-flex">
@@ -27,17 +27,27 @@ export default async function Navbar() {
               <Link href="/my-listings" className="btn-secondary hidden sm:inline-flex">
                 My listings
               </Link>
-              <Link href="/listings/new" className="btn-primary">
-                + Post ad
+              <Link
+                href="/listings/new"
+                className="btn-primary px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
+              >
+                <span className="sm:hidden">+ Post</span>
+                <span className="hidden sm:inline">+ Post ad</span>
               </Link>
               <SignOutButton />
             </>
           ) : (
             <>
-              <Link href="/login" className="btn-secondary">
+              <Link
+                href="/login"
+                className="btn-secondary px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
+              >
                 Log in
               </Link>
-              <Link href="/signup" className="btn-primary">
+              <Link
+                href="/signup"
+                className="btn-primary px-2.5 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm"
+              >
                 Sign up
               </Link>
             </>
