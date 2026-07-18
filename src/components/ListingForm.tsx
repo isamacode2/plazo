@@ -194,7 +194,7 @@ export default function ListingForm({
               ))}
             </select>
             <input
-              className="input"
+              className="input min-w-0 flex-1"
               id="price"
               type="number"
               min="0"
