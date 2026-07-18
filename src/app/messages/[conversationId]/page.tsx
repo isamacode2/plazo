@@ -71,9 +71,16 @@ export default async function ConversationPage({
         <Link href="/messages" className="text-sm text-brand-600 hover:underline">
           ← All messages
         </Link>
-        <h1 className="mt-1 text-xl font-semibold">
-          {other?.username || other?.full_name || "Conversation"}
-        </h1>
+        {other ? (
+          <Link
+            href={`/users/${other.id}`}
+            className="mt-1 inline-block text-xl font-semibold text-gray-900 hover:text-brand-600 hover:underline"
+          >
+            {other.username || other.full_name || "Conversation"}
+          </Link>
+        ) : (
+          <h1 className="mt-1 text-xl font-semibold">Conversation</h1>
+        )}
         {listing && (
           <Link href={`/listings/${listing.id}`} className="text-sm text-gray-500 hover:underline">
             Re: {listing.title}
