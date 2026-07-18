@@ -8,6 +8,7 @@ import ShareButton from "@/components/ShareButton";
 import ScamWarningBanner from "@/components/ScamWarningBanner";
 import ListingImageGallery from "@/components/ListingImageGallery";
 import RatingSummary from "@/components/RatingSummary";
+import ReportButton from "@/components/ReportButton";
 import { paymentMethodLabel } from "@/lib/paymentMethods";
 
 export default async function ListingDetailPage({
@@ -42,6 +43,17 @@ export default async function ListingDetailPage({
   const isOwner = user?.id === listing.user_id;
   const seller = listing.profiles as unknown as { username: string | null; full_name: string | null } | null;
   const category = listing.categories as unknown as { name: string; slug: string } | null;
+
+  let blockedEitherWay = false;
+  if (user && !isOwner) {
+    const { data: blockRows } = await supabase
+      .from("blocks")
+      .select("blocker_id, blocked_id")
+      .or(
+        `and(blocker_id.eq.${user.id},blocked_id.eq.${listing.user_id}),and(blocker_id.eq.${listing.user_id},blocked_id.eq.${user.id})`
+      );
+    blockedEitherWay = (blockRows?.length ?? 0) > 0;
+  }
 
   return (
     <div className="container-px py-8">
@@ -116,6 +128,10 @@ export default async function ListingDetailPage({
                   </Link>
                   <DeleteListingButton listingId={listing.id} />
                 </>
+              ) : blockedEitherWay ? (
+                <p className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-500">
+                  You can&apos;t contact this seller.
+                </p>
               ) : (
                 <ContactSellerButton listingId={listing.id} sellerId={listing.user_id} />
               )}
@@ -123,8 +139,9 @@ export default async function ListingDetailPage({
             </div>
 
             {!isOwner && (
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col gap-3">
                 <ScamWarningBanner categorySlug={category?.slug} />
+                <ReportButton listingId={listing.id} label="Report this listing" />
               </div>
             )}
           </div>

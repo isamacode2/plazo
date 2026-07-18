@@ -4,6 +4,8 @@ import { timeAgo } from "@/lib/format";
 import RatingSummary from "@/components/RatingSummary";
 import StarRating from "@/components/StarRating";
 import ListingCard, { ListingCardData } from "@/components/ListingCard";
+import ReportButton from "@/components/ReportButton";
+import BlockButton from "@/components/BlockButton";
 
 export default async function SellerProfilePage({
   params,
@@ -13,6 +15,10 @@ export default async function SellerProfilePage({
   const { id } = await params;
   const supabase = await createClient();
 
+  const {
+    data: { user: viewer },
+  } = await supabase.auth.getUser();
+
   const { data: profile } = await supabase
     .from("profiles")
     .select("id, username, full_name, location, created_at")
@@ -20,6 +26,17 @@ export default async function SellerProfilePage({
     .maybeSingle();
 
   if (!profile) notFound();
+
+  let alreadyBlocked = false;
+  if (viewer && viewer.id !== id) {
+    const { data: existingBlock } = await supabase
+      .from("blocks")
+      .select("id")
+      .eq("blocker_id", viewer.id)
+      .eq("blocked_id", id)
+      .maybeSingle();
+    alreadyBlocked = !!existingBlock;
+  }
 
   const { data: ratingRow } = await supabase
     .from("profile_ratings")
@@ -75,6 +92,13 @@ export default async function SellerProfilePage({
             reviewCount={ratingRow?.review_count ?? null}
           />
         </div>
+
+        {viewer && viewer.id !== id && (
+          <div className="mt-4 flex items-center gap-4 border-t border-gray-100 pt-4">
+            <ReportButton userId={id} label="Report user" />
+            <BlockButton userId={id} alreadyBlocked={alreadyBlocked} />
+          </div>
+        )}
       </div>
 
       <div className="mt-8">

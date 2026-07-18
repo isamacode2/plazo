@@ -43,6 +43,18 @@ export default async function HomePage({
   // someone else's and click in confused.
   if (user) {
     query = query.neq("user_id", user.id);
+
+    // Hide listings from anyone blocked in either direction.
+    const { data: blockRows } = await supabase
+      .from("blocks")
+      .select("blocker_id, blocked_id")
+      .or(`blocker_id.eq.${user.id},blocked_id.eq.${user.id}`);
+    const blockedUserIds = (blockRows ?? [])
+      .map((b) => (b.blocker_id === user.id ? b.blocked_id : b.blocker_id))
+      .filter((id, i, arr) => arr.indexOf(id) === i);
+    if (blockedUserIds.length > 0) {
+      query = query.not("user_id", "in", `(${blockedUserIds.join(",")})`);
+    }
   }
 
   const activeCategory = categories?.find((c) => c.slug === params.category);
